@@ -3,10 +3,11 @@ package golang
 
 import (
 	"fmt"
-	"math/big"
+	"strconv"
+	"strings"
 )
 
-const C = `
+const C13 = `
 37107287533902102798797998220837590246510135740250
 46376937677490009712648124896970078050417018260538
 74324986199524741059474233309513058123726617309629
@@ -108,14 +109,74 @@ const C = `
 20849603980134001723930671666823555245252804609722
 53503534226472524250874054075591789781264330331690`
 
-func problem13() {
-	bi := big.NewInt(0)
-    n := "37107287533902102798797998220837590246510135740250"
-    if _, ok := bi.SetString(n, 10); ok {
-        fmt.Println(bi)
-    }
+func add_num(a int, b int) int {
+	var c int
+	for {
+		if a == 0 {
+			break
+		}
+		c = b & a
+		b = b ^ a
+
+		c = c << 1
+		a = c
+	}
+
+	return b
 }
 
-func Run() {
-	problem13()
+var F13 [][]int
+
+func parse13() {
+	s := strings.Split(strings.TrimLeft(C13, "\n"), "\n")
+	F13 = make([][]int, len(s))
+
+	for i, raw_line := range s {
+		line := strings.Split(raw_line, "")
+
+		for _, chr := range line {
+			conv, err := strconv.Atoi(chr)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			F13[i] = append(F13[i], conv)
+		}
+	}
+}
+
+func add(a []int, b []int) (c []int) {
+
+	return
+}
+
+func problem13() {
+
+	// need to add two for extra carries
+	var f []int = make([]int, 50)
+
+	var sum int
+	var carry bool
+	for i := 0; i < len(F13); i++ {
+
+		for j := 49; j >= 0; j-- {
+
+			sum = f[j] + F13[i][j]
+			// the sum at max is 9+9 = 18,
+			// we need to carry 10 and add
+			// to the next one
+			if carry {
+				sum = sum + 1
+				carry = false
+			}
+			if sum > 9 && j != 0 {
+				sum = sum - 10
+				carry = true
+			}
+
+			f[j] = sum
+		}
+	}
+    fmt.Println(f, f[0:8])
+
 }
