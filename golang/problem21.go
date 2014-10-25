@@ -195,7 +195,3 @@ func problem21() {
 	fmt.Println("Sum of amicable numbers", amicableSum)
 
 }
-
-func Run() {
-	problem21()
-}
