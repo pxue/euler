@@ -124,16 +124,26 @@ func factorPrime(input int, fp *map[float64]float64) {
 	}
 
 	var d = 1
-	var x, y = 2, 2
-	for d == 1 {
-		x = G(x)
-		y = G(G(y))
+	var success bool
 
-		d = gcd(Abs(x-y), input)
-		if d != 1 {
-			(*fp)[float64(d)]++
-			(*fp)[float64(input/d)]++
+	for i := 2; i < 10 && !success; i++ {
+		x, y := i, i
+		for d == 1 {
+			x = G(x)
+			y = G(G(y))
+
+			if x == y {
+				break
+			}
+
+			d = gcd(Abs(x-y), input)
+			if d != 1 {
+				(*fp)[float64(d)]++
+				(*fp)[float64(input/d)]++
+				success = true
+			}
 		}
+		d = 1
 	}
 }
 
@@ -143,8 +153,12 @@ func factor(input int) map[float64]float64 {
 
 	// check if sqrt-able
 	if sqrt := math.Sqrt(float64(input)); sqrt == float64(int(sqrt)) {
-		pf[sqrt] += 1
-		input = int(sqrt)
+		// make sure the sqrt is a prime factor
+		// ignore if not. ie: 16 should factor to 2^4 not 4*2^2
+		if isPrime(int(sqrt)) {
+			pf[sqrt] += 1
+			input = int(sqrt)
+		}
 	}
 
 	for _, prime := range []int{2, 3, 5, 7, 11, 13, 17, 19} {
@@ -188,7 +202,7 @@ func problem21() {
 	amicableSum := 0
 	for k, v := range factored {
 		if proper, ok := factored[int(v)]; ok && k != int(v) && int(proper) == k {
-            fmt.Println(k, v)
+			fmt.Println(k, v)
 			amicableSum += k
 		}
 	}
